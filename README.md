@@ -46,4 +46,5 @@ Python 3 with additional libraries (pandas, yfinance, numpy, datetime, pandas_ma
 ## Inspired by
 
 - [Matt Grierson's Modeling Your Stock Portfolio Performance with Python](https://towardsdatascience.com/modeling-your-stock-portfolio-performance-with-python-fbba4ef2ef11), [repo](https://github.com/mattygyo/stock_portfolio_analysis)
+- [Kevin Boller's Blog](https://kdboller.github.io/2018/03/04/scaling-financial-insights-with-python.html), [repo](https://github.com/kdboller/pythonsp500)
 - [Kristina Chodorow's Blog](https://kchodorow.com/2020/08/06/show-me-the-money-tracking-returns/)
