@@ -12,11 +12,11 @@ Quickly visualize the performance of a portfolio of stocks, funds or whatever is
 - **Output**: A graph showing portfolio performance (P/L) against a given benchmark (e.g. SPY).
 
 `[In]`
-| date | symbol | position | unit_price | quantity | fee |
-|------|--------|----------|------------|----------|-----|
-| 2019-12-04 | AAPL | short | 112.07 | 200 | 20 |
-| 2019-11-24 | MSFT | long | 213.37 | 250 | 25 |
-| 2019-10-12 | AAPL | long | 124.00 | 350 | 35 |
+| date       | symbol | position | unit_price | quantity | fee |
+|------------|--------|----------|------------|----------|-----|
+| 2019-12-04 | AAPL   | short    | 112.07     | 200      | 20  |
+| 2019-11-24 | MSFT   | long     | 213.37     | 250      | 25  |
+| 2019-10-12 | AAPL   | long     | 124.00     | 350      | 35  |
 
 `[Out]`
 ![](/resources/performance-sample.jpg)
