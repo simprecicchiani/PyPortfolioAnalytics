@@ -1,0 +1,3 @@
+Date,Ticker,Order,Price,Quantity,Fee
+2020-07-21,AAPL,purchase,388,1,0
+2020-07-20,LIQUIDITY,deposit,1,388,0
