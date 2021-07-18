@@ -1,7 +1,7 @@
 Date,Ticker,Order,Price,Quantity,Fee
-2019-12-04,AAPL,sale,57.03,200,20
+2019-12-04,AAPL,sale,267.76,50,20
 2019-11-24,MSFT,purchase,148.3,250,25
-2019-10-12,AAPL,purchase,61.5,350,35
+2019-10-12,AAPL,purchase,234.52,88,35
 2019-10-01,CASH$,deposit,1,100000,0
 2020-01-06,FB,purchase,208,100,10
 2020-01-25,CASH$,withdrawal,1,30000,0
