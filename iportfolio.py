@@ -1,107 +1,147 @@
 import datetime
 import pandas as pd
 import numpy as np
-import numpy_financial as npf
 import yfinance as yf
 import pyxirr
-import matplotlib.pyplot as plt
-plt.style.use('seaborn-bright')
-plt.style.use('seaborn-whitegrid')
+import streamlit as st
 
 class pct(float):
     def __str__(self):
-        return '{:.4%}'.format(self)
 
-# import formatted list of transaction
-input_data = pd.read_csv('./test-portfolio.csv', sep=',', index_col='Date', parse_dates=True, ).sort_index()
+# st.title('Portfolio Tracker')
+# input_data = st.file_uploader("Upload Your Transactions",type=['csv'])
+# st.write(input_data)
 
-# utilities
+# READ TRANSACTIONS FROM CSV
+input_data = pd.read_csv('./test-portfolio.csv', sep=',', index_col='Date', parse_dates=True).sort_index()
+
+# UTILITIES
 tickers = input_data.Ticker.unique()
+tickers = tickers[tickers != 'CASH$']
 tickers.sort()
 start_date = input_data.index[0].date()
-end_date = datetime.date(2020,1,29) # (2021,7,16)
+end_date = datetime.date.today()
 timeline = pd.date_range(start=start_date, end=end_date)
 years = timeline.shape[0]/365
 day = datetime.timedelta(days=1)
+sec_order = ['purchase', 'sale', 'split']
+cash_order = ['deposit', 'withdrawal', 'dividend', 'reinvestment']
 
-transactions = pd.DataFrame(0, columns=tickers, index = timeline)
+# INITIALISE DATAFRAMES
+sec_trans = pd.DataFrame(0, columns=tickers, index = timeline)
 splits = pd.DataFrame(1, columns=tickers, index = timeline)
-dividends = pd.DataFrame(0, columns=tickers, index = timeline)
-prices = pd.DataFrame(0, columns=tickers, index = timeline)
-fees = pd.DataFrame(0, columns=tickers, index = timeline)
-portfolio = pd.DataFrame(0, columns=['Invested Capital'], index = timeline)
-
+holdings = pd.DataFrame(0, columns=tickers, index = timeline)
+account = pd.DataFrame(0, columns=['ext_mov', 'inv_cap', 'int_mov', 'holding'], index = timeline)
 market_values = yf.download(list(tickers), start=start_date + day, end=end_date + day)['Adj Close']
-market_values.loc[:,'LIQUIDITY']=1
-market_values = market_values.asfreq(freq='1D', method='ffill')
+market_values = market_values.reindex(index=timeline, method='nearest')
 
-# record transactions per ticker
-for date, transaction in input_data.iterrows():
-    if transaction.Order == 'purchase' or transaction.Order == 'deposit':
-        sign = 1
+# ORDER FUNCTIONS
+def deposit(date, trans):
+    account.ext_mov.loc[date] = account.ext_mov.loc[date] + trans.Quantity * trans.Price
+    account.int_mov.loc[date] = account.int_mov.loc[date] + trans.Quantity * trans.Price - trans.Fee
+
+def withdrawal(date, trans):
+    account.ext_mov.loc[date] = account.ext_mov.loc[date] - trans.Quantity * trans.Price
+    account.int_mov.loc[date] = account.int_mov.loc[date] - trans.Quantity * trans.Price - trans.Fee
+    
+def reinvestment(date, trans):
+    account.int_mov.loc[date] = account.int_mov.loc[date] + trans.Quantity * trans.Price - trans.Fee
+
+def purchase(date, trans):
+    account.int_mov.loc[date] = account.int_mov.loc[date] - trans.Quantity * trans.Price - trans.Fee
+    sec_trans.loc[date, trans.Ticker] = sec_trans.loc[date, trans.Ticker] + trans.Quantity
+
+def sell(date, trans):
+    account.int_mov.loc[date] = account.int_mov.loc[date] + trans.Quantity * trans.Price - trans.Fee
+    sec_trans.loc[date, trans.Ticker] = sec_trans.loc[date, trans.Ticker] - trans.Quantity
+
+def dividend(date, trans):
+    reinvestment(date, trans)
+
+def ssplit(date, trans):
+    splits.loc[date] = trans.Price
+
+# TRANSACTION SORTING FUNCTION
+def event(date, trans):
+    if trans.Order == 'purchase':
+        purchase(date, trans)
+    elif trans.Order == 'sale':
+        sell(date, trans)
+    elif trans.Order == 'split':
+        ssplit(date, trans)
+    elif trans.Order == 'deposit':
+        deposit(date, trans)
+    elif trans.Order == 'withdrawal':
+        withdrawal(date, trans)
+    elif trans.Order == 'reinvestment':
+        reinvestment(date, trans)
+    elif trans.Order == 'dividend':
+        dividend(date, trans)
     else:
-        sign = -1
-    transactions.loc[date, transaction.Ticker] = sign * transaction.Quantity
-    prices.loc[date, transaction.Ticker] = transaction.Price
-    fees.loc[date, transaction.Ticker] = transaction.Fee
+        pass
 
-# keep track of invested capital
-portfolio['Invested Capital'] = transactions.loc[:,'LIQUIDITY'].copy()
-account = transactions.loc[:,'LIQUIDITY'].copy()
+# DATA FILLING FUNCTIONS
+def backfill(df, delta):
+    for i in range(df.shape[0]):
+        prev = 0
+        if i > 0:
+            prev = df.iloc[i-1]
+        df.iloc[i] = prev + delta.iloc[i]
 
-# insert cash movements
-transactions.loc[:,'LIQUIDITY'] = transactions.loc[:,'LIQUIDITY'].values - np.sum((transactions.loc[:, transactions.columns != 'LIQUIDITY'].values*prices.loc[:, prices.columns != 'LIQUIDITY'].values),axis=1)  - np.sum(fees.values,axis=1)
+def forwprod(df):
+    for i in reversed(range(df.shape[0])):
+        nex = 1
+        if i < df.shape[0]-2:
+            nex = df.iloc[i+1]
+        df.iloc[i] = nex * df.iloc[i]
 
+# DOWNLOAD AND RECORD SPLITS DATA
 for ticker in tickers:
-    try:
-        divs = yf.Ticker(ticker).dividends.loc[start_date + day : end_date + day]
-        for date, div in divs.iteritems():
-            dividends.loc[date, ticker] = div
-        spls = yf.Ticker(ticker).splits.loc[start_date + day : end_date + day]
-        for date, split in spls.iteritems():
-            splits.loc[date, ticker] = split
-    except:
-        pass
+    spls = yf.Ticker(ticker).splits.loc[start_date + day : end_date + day]
+    for date, split in spls.iteritems():
+        input_data.loc[date] = [ticker, 'split', split, np.nan, 0]
 
-for date in splits.index[::-1]:
-    try:
-        tomorrow = date + day
-        splits.loc[date] = splits.loc[tomorrow] * splits.loc[date]
-    except:
-        pass
+# PROCESS SECURITY TRANSACTIONS
+for date, transaction in input_data[input_data.Order.isin(sec_order)].iterrows():
+    event(date, transaction)
 
-holdings = transactions.copy()
+# FILL HOLDINGS
+backfill(holdings, sec_trans*splits)
 
-# generate holdings from transactions
-for date in holdings.index:
-    try:
-        yesterday = date - day
-        holdings.loc[date] = transactions.loc[date] * splits.loc[date] + holdings.loc[yesterday]
-        portfolio.loc[date, 'Invested Capital'] = portfolio.loc[date, 'Invested Capital'] + portfolio.loc[yesterday, 'Invested Capital']
-    except:
-        pass
+# DOWNLOAD AND RECORD DIVIDENDS DATA
+for ticker in tickers:
+    divs = yf.Ticker(ticker).dividends.loc[start_date + day : end_date + day]
+    for date, div in divs.iteritems():
+        input_data.loc[date] = [ticker, 'dividend', div, holdings.loc[date, ticker], 0]
 
-holdings_values = pd.DataFrame((holdings.values * market_values.values), columns=tickers, index = timeline)
+# PROCESS CASH TRANSACTIONS
+for date, transaction in input_data[input_data.Order.isin(cash_order)].iterrows():
+    event(date, transaction)
 
+# FILL EXTERNAL AND INTERNAL ACCOUNT MOVEMENTS
+backfill(account.inv_cap, account.ext_mov)
+backfill(account.holding, account.int_mov)
+
+# OUTPUT DATA
+holdings_values = pd.DataFrame((holdings * market_values), columns=tickers, index=timeline)
+holdings_values['CASH$'] = account.holding
+
+portfolio = pd.DataFrame(0, columns=['Value'], index = timeline)
 portfolio['Value'] = holdings_values.sum(axis=1)
-portfolio['P/L'] = portfolio['Value']-portfolio['Invested Capital']
-portfolio['%P/L'] = portfolio['P/L']/portfolio['Invested Capital']
-portfolio['%day'] = portfolio['Value'].pct_change()
-portfolio['Log Ret'] = np.log(portfolio['Value']/portfolio['Value'].shift(1))
+portfolio['P/L'] = portfolio['Value'] - account.inv_cap
+portfolio['%P/L'] = portfolio['P/L'] / account.inv_cap
+portfolio['%day'] = (portfolio['Value']- account.ext_mov).pct_change()
+portfolio['Log Ret'] = np.log((portfolio['Value'] - account.ext_mov) / portfolio['Value'].shift(1))
 
-cash_flows = -account + np.sum(dividends.values,axis=1) - np.sum(fees.values,axis=1)
+cash_flows = - account.ext_mov
 cash_flows.iloc[-1] = portfolio['Value'].iloc[-1]
 
 asset_allocation = holdings_values.copy()
 asset_allocation = asset_allocation.divide(portfolio['Value'], axis=0)
 
 xirr = pyxirr.xirr(cash_flows.index, cash_flows.values)
-ann_xirr = (1+xirr)**(365/portfolio.shape[0])-1
-print('XIRR:', pct(xirr), '\nAnnualised XIRR', pct(ann_xirr))
+xirr_ann = (1+xirr)**(1/years)-1
 
-plt.title('Profit/Loss')
-plt.plot(portfolio['%P/L'])
-plt.show()
-plt.title('Asset Allocation')
-plt.pie(asset_allocation.iloc[-1], labels=asset_allocation.columns)
-plt.show()
+# st.write('XIRR:', pct(xirr))
+# st.write('Annualised XIRR', pct(xirr_ann))
+# st.line_chart(portfolio['P/L'])
