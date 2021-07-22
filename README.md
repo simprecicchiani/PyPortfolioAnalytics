@@ -1,10 +1,11 @@
 # iPortfolio
 
-[![status](https://img.shields.io/badge/Status-I%20haven't%20even%20started-red)](/)
+[![status](https://img.shields.io/badge/Status-Alpha-yellow)](/)
 
 ## The idea
 
-Quickly visualize the performance of a portfolio of stocks, funds or whatever is quoted on financial markets (with accessible data e.g. Yahoo Finance).
+There are tons of python scripts for portfolio performance. None of them is a real value tracker nor have proper performance indicators.
+This project is an attempt in analysing portfolios with siginicant financial data such as time-weighted returns, opportunity cost of money, etc.
 
 ## The UX
 
@@ -27,13 +28,13 @@ Interactive web page with [Streamlit](https://streamlit.io).
 
 ## Under the Hood
 
-Python 3 with additional libraries (pandas, yfinance, numpy, datetime, pandas_market_calendars, etc.)
+Python 3 with additional packages (mainly pandas).
 
-## Challenges
+## To Do
 
-- [ ] Give the possibility to generate a transactions' data table
-- [ ] Deal with inflows and outflows of liquidity
-- [ ] Find a suitable name for this project
+- [ ] Handle currencies
+- [ ] Data validation and hedge cases
+- [ ] UI
 
 ## Further development
 

@@ -1,0 +1,7 @@
+Date,Ticker,Order,Price,Quantity,Fee
+2021-02-01,EUR,deposit,1,10000,0
+2021-02-15,ENEL.MI,purchase,8.50,200,20
+2021-06-01,ROO.L,purchase,247,20,2
+2021-06-10,FB,purchase,330,10,1
+2021-07-12,ROO.L,sale,300,20,2
+2021-07-22,EUR,withdrawal,1,2500,0
