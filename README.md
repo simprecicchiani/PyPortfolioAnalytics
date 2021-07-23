@@ -4,8 +4,7 @@
 
 ## The idea
 
-There are tons of python scripts for portfolio performance. None of them is a real value tracker nor have proper performance indicators.
-This project is an attempt in analysing portfolios with siginicant financial data such as time-weighted returns, opportunity cost of money, etc.
+Building a proper portfolio tracker. Featuring historical allocation, cash flows, **real** returns and more.
 
 ## The UX
 
@@ -20,7 +19,7 @@ This project is an attempt in analysing portfolios with siginicant financial dat
 | 2019-10-12 | AAPL   | long     | 124.00     | 350      | 35  |
 
 `[Out]`
-![](/resources/performance-sample.jpg)
+![](/samples/performance-sample.jpg)
 
 ## The UI
 
@@ -32,20 +31,15 @@ Python 3 with additional packages (mainly pandas).
 
 ## To Do
 
+- [ ] Migration to Alpha Vantage
 - [ ] Handle currencies
-- [ ] Data validation and hedge cases
+- [ ] Data validation, hedge cases
+- [ ] Leverage Python OOP
 - [ ] UI
 
 ## Further development
 
-- Portfolio stats (High-Low-Avg, Correlation, etc.)
-- Additional graphical informations (SMAs, Forecasts, Montecarlo Analysis, etc.)
-- Basic advices (Optimal Allocation)
-- Risk exposure (VaR)
-- Hedging strategies
-
-## Inspired by
-
-- [Matt Grierson's Modeling Your Stock Portfolio Performance with Python](https://towardsdatascience.com/modeling-your-stock-portfolio-performance-with-python-fbba4ef2ef11), [repo](https://github.com/mattygyo/stock_portfolio_analysis)
-- [Kevin Boller's Blog](https://kdboller.github.io/2018/03/04/scaling-financial-insights-with-python.html), [repo](https://github.com/kdboller/pythonsp500)
-- [Kristina Chodorow's Blog](https://kchodorow.com/2020/08/06/show-me-the-money-tracking-returns/)
+- Portfolio Technicals
+- Lots of charts
+- Indicators (Sharpe Ratio, Beta, VaR, etc)
+- Sector Exposure (stock only)
