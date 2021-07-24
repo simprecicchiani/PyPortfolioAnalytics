@@ -1,5 +1,6 @@
 .DS_Store
 .ipynb_checkpoints/
+.vscode/
 sample-mf.csv
 sample-account.csv
 api-key.txt
