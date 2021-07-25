@@ -1,6 +1,7 @@
 .DS_Store
-.ipynb_checkpoints/
-.vscode/
+.ipynb_checkpoints
+.vscode
+__pycache__
 sample-mf.csv
 sample-account.csv
 api-key.txt
