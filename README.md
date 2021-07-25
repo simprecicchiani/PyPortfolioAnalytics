@@ -19,7 +19,7 @@ Building a proper portfolio tracker. Featuring historical allocation, cash flows
 | 2019-10-12 | AAPL   | long     | 124.00     | 350      | 35  |
 
 `[Out]`
-![](/samples/performance-sample.jpg)
+![](/samples/performance-sample.png)
 
 ## The UI
 
