@@ -31,10 +31,10 @@ Python 3 with additional packages (mainly pandas).
 
 ## To Do
 
-- [ ] Migration to Alpha Vantage
+- [x] Migration to Alpha Vantage
 - [ ] Handle currencies
 - [ ] Data validation, hedge cases
-- [ ] Leverage Python OOP
+- [x] Leverage Python OOP
 - [ ] UI
 
 ## Further development
