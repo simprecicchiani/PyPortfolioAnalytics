@@ -3,5 +3,4 @@
 .vscode
 __pycache__
 sample-mf.csv
-sample-account.csv
 api-key.txt

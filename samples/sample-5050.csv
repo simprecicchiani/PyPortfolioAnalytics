@@ -1,0 +1,4 @@
+Date,Ticker,Order,Quantity,Price,Fee
+2018-09-12,VT,purchase,1000,75,375
+2018-09-12,BNDW,purchase,1000,75,375
+2018-09-09,USD,deposit,150750,1,0
