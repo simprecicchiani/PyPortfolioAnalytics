@@ -62,10 +62,10 @@ class Ticker:
 
 class Portfolio:
     
-    def __init__(self, data, currency):
+    def __init__(self, filename, currency):
         # self.data = pd.read_csv(filename, sep=',', index_col='Date', parse_dates=True).sort_index()
-        self.data = data
-        self.timeline = pd.date_range(start=self.data.index[0].date(), end=datetime.date.today())
+        self.data = filename
+        self.timeline = pd.date_range(start=self.data.index[0], end=datetime.date.today())
         self.currency = currency
         self.account = Account(self.currency, self.timeline)
         self.tickers = dict() # dictionary with Ticker object at key='TICKER NAME'
