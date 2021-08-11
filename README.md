@@ -4,6 +4,19 @@
 
 The app, despite its early stage, is working properly. You may encounter, however, issues where datasets are incomplete or wrong (from both yfinance and alpha vantage).
 
+Testing with Anaconda:
+```
+$ git clone https://github.com/simprecicchiani/iPortfolio.git
+$ cd iPortfolio
+$ conda env create -f environment.yml
+$ conda activate iportfolio
+```
+
+Test it with either `logic-yf.ipynb` (uses yahoo finance, slower) or `logic-av.ipynb` (requires [free Alpha Vantage API key](https://www.alphavantage.co/support/#api-key)). Run the web app with
+```
+$ streamlit run app.py
+```
+
 ## The idea
 
 Building a proper portfolio tracker. Featuring historical allocation, cash flows, real returns and more.
