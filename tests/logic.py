@@ -130,4 +130,3 @@ class Portfolio:
             'Portfolio': self.pctpl,
             ticker: (bench/bench[0]-1),
         }, axis=1)
-        

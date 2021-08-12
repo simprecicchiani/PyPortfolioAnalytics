@@ -4,7 +4,7 @@
 
 The app, despite its early stage, is working properly. You may encounter, however, issues where datasets are incomplete or wrong (from both yfinance and alpha vantage).
 
-Testing with Anaconda:
+Testing in conda environment:
 ```
 $ git clone https://github.com/simprecicchiani/iPortfolio.git
 $ cd iPortfolio
@@ -12,9 +12,18 @@ $ conda env create -f environment.yml
 $ conda activate iportfolio
 ```
 
-Test it with either `logic-yf.ipynb` (uses yahoo finance, slower) or `logic-av.ipynb` (requires [free Alpha Vantage API key](https://www.alphavantage.co/support/#api-key)). Run the web app with
+Open either `test/logic-yf.ipynb` (uses Yahoo Finance, slower) or `test/logic-av.ipynb` (requires [free Alpha Vantage API key](https://www.alphavantage.co/support/#api-key)).
+
+Or install dependencies with pip in a virtual environment:
 ```
-$ streamlit run app.py
+$ git clone https://github.com/simprecicchiani/iPortfolio.git
+$ cd iPortfolio
+$ pip install -r requirements.txt
+```
+
+Run the web app with
+```
+$ streamlit run app/main.py
 ```
 
 ## The idea
@@ -34,11 +43,13 @@ Building a proper portfolio tracker. Featuring historical allocation, cash flows
 | 2020-01-25 | CASH.USD | withdrawal | 1      | 30000    | 0   |
 
 `[Out]` Portfolio stats
-![](/samples/performance-sample.png)
+![](/assets/performance-sample.png)
 
 ## The UI
 
 [Streamlit](https://streamlit.io) web app
+
+[iPortfolio transaction builder UI](/assets/transaction-builder.gif)
 
 ## Built with
 
@@ -47,10 +58,10 @@ Python 3 and additional packages (leveraging pandas date index feature)
 ## To Do
 
 - [x] Migration to Alpha Vantage
-- [ ] Handle currencies (done in yf)
-- [ ] Data validation, hedge cases
-- [x] Leverage Python OOP
-- [ ] UI
+- [ ] Multicurrency portfolio (done in yf)
+- [ ] Data sanity check
+- [x] Portfolio builder UI
+- [ ] Portfolio dashboard
 
 ## Further development
 
