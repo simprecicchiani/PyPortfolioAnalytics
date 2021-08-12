@@ -25,8 +25,11 @@ class Table():
         b64 = base64.b64encode(self.data.to_csv(index=False).encode()).decode()
         return f'<a href="data:file/txt;base64,{b64}" download="Portfolio.csv">Download as CSV</a>'
 
-   
+
+# PAGE SETUP
+
 def app():
+
     if 'table' not in st.session_state:
         st.session_state.table = Table()
 
@@ -35,23 +38,31 @@ def app():
     LEN = len(st.session_state.table.data)
     EMPTY = (True if LEN == 0 else False)
 
-    # PAGE SETUP
+    
+    with st.expander('Options'):
 
-    st.title('Welcome to iPortfolio')
+        col01, col02 = st.columns(2)
 
-    with st.expander('Upload transactions'):
-
+        with col01:
+            st.selectbox('Portfolio Currency', pd.read_csv(r'./assets/currencies.csv'), index=143)
+        with col02:
+            st.text_input('Alpha Vantage API', key='api')
+            st.write('[Get a free api key](https://www.alphavantage.co/support/#api-key)')
+    
+    
+    with st.expander('Upload'):
+     
         uploaded_file = st.file_uploader('', type=['.csv'])
+
         if uploaded_file != None:
-            df = pd.read_csv(uploaded_file)
-            st.button('Load', on_click=st.session_state.table.add, args=(df,))
+            st.button('Load on memory', on_click=st.session_state.table.add, args=(pd.read_csv(uploaded_file),))
 
 
     with st.expander('Add manually'):
 
-        col11, col12= st.columns([2,3])
-        col21, col22= st.columns(2)
-        col31, col32, col33= st.columns([3,3,2])
+        col11, col12 = st.columns([2,3])
+        col21, col22 = st.columns(2)
+        col31, col32, col33 = st.columns([3,3,2])
 
         with col11:
             transaction_date = st.date_input('Transaction Date')
@@ -61,7 +72,7 @@ def app():
             
         if SECURITY:
             with col21:
-                transaction_ticker = st.text_input('Ticker')
+                transaction_ticker = st.selectbox('Ticker', pd.read_csv(r'./assets/us_tickers.csv'))
             with col22:
                 transaction_price = st.number_input('Price', 0.0, None, 0.0, 10.0)
             with col31:
@@ -102,6 +113,7 @@ def app():
                     index = st.slider('Select row number', 0, LEN-1,0,1)
                     st.button('Delete row', on_click=st.session_state.table.delete, args=(index,))
 
+        st.subheader('')
         st.write(st.session_state.table.data)
         st.markdown(st.session_state.table.download(), unsafe_allow_html=True)
 
@@ -110,13 +122,6 @@ def app():
             st.session_state.portfolio = Portfolio(df, 'USD', st.session_state.api)
             st.session_state.portfolio.run()
 
-        st.text_input('Alpha Vantage API', key='api')
 
         if st.session_state.api != None:
             st.button('Run App', on_click=run_logic, args=(st.session_state.table.data,))
-
-    def plot(data):
-        st.line_chart(data)
-
-    if 'portfolio' in st.session_state:
-        st.button('Plot', on_click=plot, args=(st.session_state.portfolio.holdings,))

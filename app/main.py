@@ -1,11 +1,13 @@
 import streamlit as st
 from helpers.multiapp import MultiApp
-from pages import transactions
+from pages import transactions, dashboard, instructions
 
-app = MultiApp()
+st.set_page_config(layout="wide")
+environment = MultiApp()
 
-# Add all your application here
-app.add_app("Home", transactions.app)
+# Add pages
+environment.add_app('Instructions', instructions.app)
+environment.add_app('Transaction builder', transactions.app)
+environment.add_app('Portfolio dashboard', dashboard.app)
 
-# The main app
-app.run()
+environment.run()

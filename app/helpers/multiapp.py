@@ -40,9 +40,13 @@ class MultiApp:
         })
 
     def run(self):
-        app = st.sidebar.radio(
+        
+        st.title('Welcome to iPortfolio')
+        app = st.selectbox(
             'Navigate',
             self.apps,
             format_func=lambda app: app['title'])
-
+        
+        st.write('---')
+        
         app['function']()

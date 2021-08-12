@@ -67,7 +67,7 @@ class Portfolio:
         self.pctpl = self.pl / self.account.invested_capital
         self.cash_flows = - self.account.external_transactions
         self.cash_flows.iloc[-1] = self.cash_flows.iloc[-1] + self.value.iloc[-1]
-        self.xirr = xirr(self.cash_flows.index, self.cash_flows.values)
+        # self.xirr = xirr(self.cash_flows.index, self.cash_flows.values)
         self.cagr = (self.value[-1]/self.value[0])**(365/self.timeline.shape[0])-1 # meaningless with withdrawals    
     
     def benchmark(self, ticker):
