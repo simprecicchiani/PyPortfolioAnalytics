@@ -43,13 +43,13 @@ Building a proper portfolio tracker. Featuring historical allocation, cash flows
 | 2020-01-25 | CASH.USD | withdrawal | 1      | 30000    | 0   |
 
 `[Out]` Portfolio stats
-![](/assets/performance-sample.png)
+![](/images/performance-sample.png)
 
 ## The UI
 
 [Streamlit](https://streamlit.io) web app
 
-[iPortfolio transaction builder UI](/assets/transaction-builder.gif)
+![iPortfolio transaction builder UI](/images/transaction-builder.gif)
 
 ## Built with
 
