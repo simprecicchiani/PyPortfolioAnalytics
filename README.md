@@ -1,4 +1,4 @@
-# iPortfolio
+# Python Portfolio Analytics
 
 [![status](https://img.shields.io/badge/Status-Alpha-yellow)](/)
 
