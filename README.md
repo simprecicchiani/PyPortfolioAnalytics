@@ -4,7 +4,7 @@
 
 The app, despite its early stage, is working properly. You may encounter, however, issues where datasets are incomplete or wrong (from both yfinance and alpha vantage).
 
-Testing in conda environment:
+Test locally in conda environment:
 ```
 $ git clone https://github.com/simprecicchiani/iPortfolio.git
 $ cd iPortfolio
@@ -12,25 +12,25 @@ $ conda env create -f environment.yml
 $ conda activate iportfolio
 ```
 
-Open either `test/logic-yf.ipynb` (uses Yahoo Finance, slower) or `test/logic-av.ipynb` (requires [free Alpha Vantage API key](https://www.alphavantage.co/support/#api-key)).
-
-Or install dependencies with pip in a virtual environment:
+Alternatively with pip in a virtual environment (python 3.9):
 ```
 $ git clone https://github.com/simprecicchiani/iPortfolio.git
 $ cd iPortfolio
 $ pip install -r requirements.txt
 ```
 
-Run the web app with
+Run the web app locally with
 ```
 $ streamlit run app/main.py
 ```
+
+Open either `/tests/yf_test.ipynb` (uses Yahoo Finance, slower, support multicurrency) or `/tests/av_test.ipynb` (requires a [free Alpha Vantage API key](https://www.alphavantage.co/support/#api-key)).
 
 ## The idea
 
 Building a proper portfolio tracker. Featuring historical allocation, cash flows, real returns and more.
 
-## The UX
+### UX
 
 `[In]` Transactions
 | Date       | Ticker   | Order      | Price  | Quantity | Fee |
@@ -45,15 +45,15 @@ Building a proper portfolio tracker. Featuring historical allocation, cash flows
 `[Out]` Portfolio stats
 ![](/images/performance-sample.png)
 
-## The UI
+### UI
 
 [Streamlit](https://streamlit.io) web app
 
 ![iPortfolio transaction builder UI](/images/transaction-builder.gif)
 
-## Built with
+### Built with
 
-Python 3 and additional packages (leveraging pandas date index feature)
+Python 3.9 and additional packages (leveraging pandas DatetimeIndex feature)
 
 ## To Do
 
