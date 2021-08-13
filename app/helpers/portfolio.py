@@ -21,10 +21,10 @@ class Portfolio:
         if not self._processed:
             for date, transaction in self.data.iterrows():
                 self.add_transaction(date, transaction)
-            for ticker in self.securities.values():
-                ticker.run()
+            for security in self.securities.values():
+                security.run()
                 # add dividends to account
-                self.account.internal_transactions = self.account.internal_transactions + ticker.dividends * ticker.holdings # / fx_rate
+                self.account.internal_transactions = self.account.internal_transactions + security.dividends * security.holdings # / fx_rate
             self.account.run()
             self.join_holdings()
             self.generate_stats()
