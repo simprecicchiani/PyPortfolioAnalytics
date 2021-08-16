@@ -41,7 +41,7 @@ class MultiApp:
 
     def run(self):
         
-        st.title('Welcome to iPortfolio')
+        st.title('Py Portfolio Analytics')
         app = st.selectbox(
             'Navigate',
             self.apps,
