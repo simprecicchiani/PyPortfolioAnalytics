@@ -7,13 +7,10 @@ from .security import Security
 
 class Portfolio:
     
-    def __init__(self, data, currency, api_key):
-        # self.data = pd.read_csv(filename, sep=',', index_col='Date', parse_dates=True).sort_index()
+    def __init__(self, data):
         self.data = data
-        self.api_key = api_key
         self.timeline = pd.date_range(start=self.data.index[0], end=datetime.date.today())
-        self.currency = currency
-        self.account = Account(self.currency, self.timeline)
+        self.account = Account(self.timeline)
         self.securities = dict() # dictionary with Security object at key='TICKER NAME'
         self._processed = False
     
@@ -44,12 +41,12 @@ class Portfolio:
     
     def purchase(self, date, transaction):
         self.account.internal_flow(date,- transaction.Quantity * transaction.Price - transaction.Fee ) # / fx_rate
-        tick = self.securities.setdefault(transaction.Ticker, Security(transaction.Ticker, self.timeline, self.api_key))
+        tick = self.securities.setdefault(transaction.Ticker, Security(transaction.Ticker, self.timeline))
         tick.update(date, transaction.Quantity)
 
     def sale(self, date, transaction):
         self.account.internal_flow(date, transaction.Quantity * transaction.Price - transaction.Fee) # / fx_rate
-        tick = self.securities.setdefault(transaction.Ticker, Security(transaction.Ticker, self.timeline, self.api_key))
+        tick = self.securities.setdefault(transaction.Ticker, Security(transaction.Ticker, self.timeline))
         tick.update(date, - transaction.Quantity)
 
     def join_holdings(self):
@@ -67,11 +64,11 @@ class Portfolio:
         self.pctpl = self.pl / self.account.invested_capital
         self.cash_flows = - self.account.external_transactions
         self.cash_flows.iloc[-1] = self.cash_flows.iloc[-1] + self.value.iloc[-1]
-        # self.xirr = xirr(self.cash_flows.index, self.cash_flows.values)
+        self.xirr = xirr(self.cash_flows.index, self.cash_flows.values)
         self.cagr = (self.value[-1]/self.value[0])**(365/self.timeline.shape[0])-1 # meaningless with withdrawals    
     
     def benchmark(self, ticker):
-        bench = Security(ticker, self.timeline, self.api_key).data['5. adjusted close']
+        bench = Security(ticker, self.timeline).data['5. adjusted close']
         return pd.concat({
             'Portfolio': self.pctpl,
             ticker: (bench/bench[0]-1),

@@ -1,17 +1,17 @@
 import pandas as pd
-from .alphavantage import ts
+from .alphavantage import av
 
 
 class Security:
 
-    def __init__(self, name, timeline, api_key):
+    def __init__(self, name, timeline):
         self.name = name
         self.transactions = pd.Series(0, name=self.name, index=timeline)
-        try:
-            self.data = pd.read_csv('./data/'+self.name+'.csv', sep=',', index_col='date', parse_dates=True)
-        except FileNotFoundError:
-            self.data = ts(api_key).get_daily_adjusted(self.name, outputsize='full')[0].iloc[::-1]
-            self.data.to_csv(r'./data/'+self.name+'.csv')
+        # try:
+        #     self.data = pd.read_csv('/data/'+self.name+'.csv', sep=',', index_col='date', parse_dates=True)
+        # except FileNotFoundError:
+        self.data = av.ts.get_daily_adjusted(self.name, outputsize='full')[0].iloc[::-1]
+            # self.data.to_csv('/data/'+self.name+'.csv')
         self.data = self.data.reindex(index=timeline, method='nearest').fillna(method='ffill').loc[timeline[0]:timeline[-1]]
         self.prices = self.data['4. close']
         self.dividends = self.data['7. dividend amount']
