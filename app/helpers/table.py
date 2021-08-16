@@ -11,8 +11,8 @@ class Orders:
 
 class Tickers:
 
-    US = genfromtxt(getenv('PWD')+'/assets/us_tickers.csv', dtype=str, delimiter=',')
-    CURRENCIES = genfromtxt(getenv('PWD')+'/assets/currencies.csv', dtype=str, delimiter=',')
+    US = genfromtxt('assets/us_tickers.csv', dtype=str, delimiter=',')
+    CURRENCIES = genfromtxt('assets/currencies.csv', dtype=str, delimiter=',')
 
 class Table:
 
