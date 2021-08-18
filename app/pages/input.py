@@ -2,7 +2,7 @@ from posix import environ
 import streamlit as st
 import pandas as pd
 from os import environ
-from helpers.table import Orders, Tickers, Table
+from helpers.builder import Orders, Tickers, Table
 from helpers.portfolio import Portfolio
 from helpers.alphavantage import av
 

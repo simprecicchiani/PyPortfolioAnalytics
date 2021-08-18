@@ -4,6 +4,8 @@ from numpy import log
 from pyxirr import xirr
 from .account import Account
 from .security import Security
+from .alphavantage import av
+
 
 class Portfolio:
     
@@ -18,11 +20,6 @@ class Portfolio:
         if not self._processed:
             for date, transaction in self.data.iterrows():
                 self.add_transaction(date, transaction)
-            for security in self.securities.values():
-                security.run()
-                # add dividends to account
-                self.account.internal_transactions = self.account.internal_transactions + security.dividends * security.holdings # / fx_rate
-            self.account.run()
             self.join_holdings()
             self.generate_stats()
         self._processed = True
@@ -50,9 +47,13 @@ class Portfolio:
         tick.update(date, - transaction.Quantity)
 
     def join_holdings(self):
-        self.holdings = pd.DataFrame(self.account.holdings, columns=[self.account.name])
-        for ticker in self.securities.values():
-            self.holdings = self.holdings.join(ticker.holdings_value)
+        self.holdings = pd.DataFrame(index=self.timeline)
+        for security in self.securities.values():
+            security.run()
+            self.account.internal_transactions = self.account.internal_transactions + security.holdings_dividend
+            self.holdings = self.holdings.join(security.holdings_value.rename(security.name))
+        self.account.run()
+        self.holdings = self.holdings.join(self.account.holdings.rename(self.account.name))
 
     def generate_stats(self):
         self.value = self.holdings.sum(axis=1)

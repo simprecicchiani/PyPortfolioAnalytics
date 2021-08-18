@@ -9,8 +9,6 @@ class av:
         ts = TimeSeries(key=getenv('ALPHAVANTAGE_API_KEY'), output_format='pandas', indexing_type='date')
         # cc = ForeignExchange(key=api_key, output_format='pandas', indexing_type='date')
         # fd = FundamentalData(key=api_key, output_format='pandas')
-        VALID_API = True
     
     except ValueError:
         print('Please provide a valid AlphaVantage API key.\nGet a free key from https://www.alphavantage.co/support/#api-key')
-        VALID_API = False
