@@ -1,10 +1,9 @@
 import pandas as pd
-from os import getenv
 
 class Account:
 
     def __init__(self, timeline):
-        self.name = 'CASH.' + getenv('ACCOUNT_CURRENCY')
+        self.name = 'CASH.USD'
         self.internal_transactions = pd.Series(0, index=timeline)
         self.external_transactions = pd.Series(0, index=timeline)
     

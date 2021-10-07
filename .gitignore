@@ -1,6 +1,7 @@
 .DS_Store
 .ipynb_checkpoints
 .vscode
+.streamlit
 __pycache__
 mutual_funds.csv
 secrets.py

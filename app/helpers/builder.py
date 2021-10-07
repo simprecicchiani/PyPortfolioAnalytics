@@ -1,7 +1,6 @@
 import pandas as pd
 from numpy import genfromtxt
 import base64
-from os import getenv
 import datetime
 
 class Orders:
@@ -28,7 +27,7 @@ class Table:
     def validate(date, ticker, order, price, quantity, fee):
 
         ticker = ticker.upper()
-        ACCOUNT_TRANSACTION = (True if ticker == 'CASH.' + getenv('ACCOUNT_CURRENCY') else False)
+        ACCOUNT_TRANSACTION = (True if ticker == 'CASH.USD' else False)
         ORDERS = (Orders.ACCOUNT if ACCOUNT_TRANSACTION else Orders.SECURITY)
 
         if not isinstance(date, datetime.date):
