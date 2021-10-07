@@ -84,7 +84,7 @@ class Table:
 
     def add_from_csv(self, csv):
 
-        csv = pd.read_csv(csv)
+        csv = pd.read_csv(csv, parse_dates=True)
 
         for i, row in csv.iterrows():
             self.add(row.Date, row.Ticker, row.Order, row.Price, row.Quantity, row.Fee)

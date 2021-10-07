@@ -4,18 +4,18 @@ from numpy import log
 from pyxirr import xirr
 from .account import Account
 from .security import Security
+from .alphavantage import av
 
 
 class Portfolio:
     
-    def __init__(self, filename, currency='USD'):
-        self.data = pd.read_csv(filename, sep=',', index_col='Date', parse_dates=True).sort_index()
+    def __init__(self, data):
+        self.data = data.sort_index()
         self.timeline = pd.date_range(start=self.data.index[0], end=datetime.date.today())
-        self.currency = currency
-        self.account = Account(self.currency, self.timeline)
+        self.account = Account(self.timeline)
         self.securities = dict() # dictionary with Security object at key='TICKER NAME'
         self._processed = False
-
+    
     def run(self):
         if not self._processed:
             for date, transaction in self.data.iterrows():

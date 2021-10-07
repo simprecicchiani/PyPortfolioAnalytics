@@ -2,8 +2,8 @@ import pandas as pd
 
 class Account:
 
-    def __init__(self, currency, timeline):
-        self.name = 'CASH.' + currency
+    def __init__(self, timeline):
+        self.name = 'CASH.USD'
         self.internal_transactions = pd.Series(0, index=timeline)
         self.external_transactions = pd.Series(0, index=timeline)
     
