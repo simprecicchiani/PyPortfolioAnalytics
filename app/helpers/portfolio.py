@@ -10,7 +10,7 @@ class Portfolio:
     
     def __init__(self, filename, currency='USD'):
         self.data = pd.read_csv(filename, sep=',', index_col='Date', parse_dates=True).sort_index()
-        self.timeline = pd.date_range(start=self.data.index[0], end=datetime.date.today())
+        self.timeline = pd.date_range(start=self.data.index[0], end=datetime.date.today(), freq='B')
         self.currency = currency
         self.account = Account(self.currency, self.timeline)
         self.securities = dict() # dictionary with Security object at key='TICKER NAME'
@@ -60,6 +60,7 @@ class Portfolio:
         self.daily_gross_ret = self.value/self.value.shift(periods=1)
         self.daily_ret = self.daily_gross_ret - 1
         self.daily_log_ret = log(self.daily_gross_ret)
+        self.std = self.daily_ret.std()
         self.semistd = self.daily_ret[self.daily_ret < self.daily_ret.mean()].std()
         self.pl = self.value - self.account.invested_capital
         self.pctpl = self.pl / self.account.invested_capital

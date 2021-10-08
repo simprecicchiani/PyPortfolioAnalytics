@@ -1,8 +1,8 @@
 # Python Portfolio Analytics
 
-[![status](https://img.shields.io/badge/Status-Alpha-yellow)](/)
+[![status](https://img.shields.io/badge/Status-Running-green)](https://share.streamlit.io/simprecicchiani/pyportfolioanalytics/app/main.py)
 
-The app, despite its early stage, is working properly. You may encounter, however, issues where datasets are incomplete or wrong (from both yfinance and alpha vantage).
+The app, despite its early stage, is working properly. You may encounter some issues where datasets are incomplete or wrong (from both yfinance and alpha vantage).
 
 Test locally in conda environment:
 ```
@@ -36,20 +36,20 @@ Building a proper portfolio tracker. Featuring historical allocation, cash flows
 | Date       | Ticker   | Order      | Price  | Quantity | Fee |
 |------------|----------|------------|--------|----------|-----|
 | 2019-10-01 | CASH.USD | deposit    | 1      | 100000   | 0   |
-| 2019-10-12 | AAPL     | purchase   | 234.52 | 88       | 35  |
-| 2019-11-24 | MSFT     | purchase   | 148.3  | 250      | 25  |
-| 2019-12-04 | AAPL     | sale       | 267.76 | 50       | 20  |
+| 2019-10-11 | AAPL     | purchase   | 234.52 | 88       | 35  |
+| 2019-11-25 | MSFT     | purchase   | 148.3  | 250      | 25  |
+| 2019-12-04 | AAPL     | sale       | 262.08 | 50       | 20  |
 | 2020-01-06 | FB       | purchase   | 208    | 100      | 10  |
 | 2020-01-25 | CASH.USD | withdrawal | 1      | 30000    | 0   |
 
 `[Out]` Portfolio stats
-![](/images/performance-sample.png)
+![](/images/performance-sample.jpg)
 
 ### UI
 
 [Streamlit](https://streamlit.io) web app
 
-![iPortfolio transaction builder UI](/images/transaction-builder.gif)
+![](/images/ui.jpg)
 
 ### Built with
 
@@ -58,10 +58,10 @@ Python 3.9 and additional packages (leveraging pandas DatetimeIndex feature)
 ## To Do
 
 - [x] Migration to Alpha Vantage
-- [ ] Multicurrency portfolio (done in yf)
-- [ ] Data sanity check
-- [x] Portfolio builder UI
-- [ ] Portfolio dashboard
+- [x] Portfolio builder UI (not available)
+- [x] Data sanity check (not available)
+- [x] Portfolio dashboard (early stage)
+- [ ] Multicurrency portfolio (done in yf variant)
 
 ## Further development
 
