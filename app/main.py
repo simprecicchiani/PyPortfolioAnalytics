@@ -1,18 +1,24 @@
 import streamlit as st
-import pandas as pd
 from helpers.portfolio import Portfolio
 
 def dashboard():
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
+
     col1.metric('Portfolio Value',f"${round(st.portfolio.value[-1],2)}", f"${round(st.portfolio.pl[-1],2)}")
-    col2.metric("Daily Change",f"${round(st.portfolio.daily_gross_ret[-1],2)}", f"{round(st.portfolio.daily_ret[-1],2)}%")
-    col3.metric("Portfolio Standard Deviation", f"{round(st.portfolio.std*100, 2)}")
+
+    col2.metric("Daily Change",f"${round(st.portfolio.daily_change[-1],2)}", f"{round(st.portfolio.daily_ret[-1]*100,2)}%")
+
+    col3.metric("Annual Volatility _expected return", f"{round(st.portfolio.std*100, 2)}%", f"{round(st.portfolio.exp_ret,2)*100}%")
+
+    col4.metric("Sharpe _sortino Raio", f"{round(st.portfolio.sharpe, 2)}", f"{round(st.portfolio.sortino, 2)}")
+
     col11, col12 = st.columns(2)
+
     with col11:
         st.subheader('Portfolio Value')
         st.line_chart(st.portfolio.value)
-        st.subheader('Portfolio vs SPY')
-        st.line_chart(st.portfolio.benchmark('SPY'))
+        st.subheader('Portfolio vs SPY (% return)')
+        st.line_chart(st.portfolio.benchmark('SPY')*100)
 
     with col12:
         st.subheader('Portfolio Holdings')
@@ -21,7 +27,7 @@ def dashboard():
         st.bar_chart(st.portfolio.cash_flows)
 
 st.set_page_config(layout="wide")
-st.title('PyPortfolioAnalytics Dashboard 💰')
+st.title('Python Portfolio Analytics Dashboard 💰')
 
 with st.expander('Instructions'):
     '''
@@ -44,13 +50,13 @@ with st.expander('Instructions'):
     - Firs row contains these columns `Date`, `Ticker`, `Order`, `Price`, `Quantity`, `Fee`
     - Date format is `%Y-%m-%d`
     - Type of order are `deposit`, `withdrawal`, `purchase`, `sale`
-    - Only supports [Alpha Vantage tickers](https://www.buyupside.com/alphavantagelive/searchforsymboluser.php)
+    - Only supports [Yahoo Finance](https://finance.yahoo.com/) tickers
 
-    ### App caveats
-    - Only works with single currency account (and securities)
+    ### Caveats
+
+    - Works with single currency account only
     - Requires a deposit to calculate return on investment
     - Only accepts transactions within business days
-    - Alpha Vantage free API is limited to 5 calls per minute (thus the app is limited to 4 different securities + 1 benchmark)
     '''
 uploaded_file = st.file_uploader('Upload your transactions', type='csv')
 

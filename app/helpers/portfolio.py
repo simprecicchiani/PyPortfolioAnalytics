@@ -1,7 +1,6 @@
-import datetime
 import pandas as pd
-from numpy import log
-from pyxirr import xirr
+import numpy as np
+import datetime
 from .account import Account
 from .security import Security
 
@@ -57,20 +56,24 @@ class Portfolio:
 
     def generate_stats(self):
         self.value = self.holdings.sum(axis=1)
-        self.daily_gross_ret = self.value/self.value.shift(periods=1)
+        self.daily_change = (self.value-self.account.external_transactions) - self.value.shift()
+        self.daily_gross_ret = (self.value-self.account.external_transactions)/self.value.shift()
         self.daily_ret = self.daily_gross_ret - 1
-        self.daily_log_ret = log(self.daily_gross_ret)
-        self.std = self.daily_ret.std()
-        self.semistd = self.daily_ret[self.daily_ret < self.daily_ret.mean()].std()
+        self.daily_log_ret = np.log(self.daily_gross_ret)
+        self.std = self.daily_log_ret.std() * np.sqrt(252)
+        self.exp_ret = self.daily_log_ret.mean() * 252
+        self.sharpe = self.exp_ret/self.std
+        self.semistd = self.daily_log_ret[self.daily_log_ret < self.daily_log_ret.mean()].std() * np.sqrt(252)
+        self.sortino = self.exp_ret/self.semistd
+        self.daily_var_5 = np.sort(self.daily_log_ret)[int(0.05*self.daily_log_ret.size)]*self.value[-1]
+        self.daily_var_1 = np.sort(self.daily_log_ret)[int(0.01*self.daily_log_ret.size)]*self.value[-1]
         self.pl = self.value - self.account.invested_capital
         self.pctpl = self.pl / self.account.invested_capital
         self.cash_flows = - self.account.external_transactions
         self.cash_flows.iloc[-1] = self.cash_flows.iloc[-1] + self.value.iloc[-1]
-        self.xirr = xirr(self.cash_flows.index, self.cash_flows.values)
-        self.cagr = (self.value[-1]/self.value[0])**(365/self.timeline.shape[0])-1 # meaningless with withdrawals    
     
     def benchmark(self, ticker):
-        bench = Security(ticker, self.timeline).data['5. adjusted close']
+        bench = Security(ticker, self.timeline).prices
         return pd.concat({
             'Portfolio': self.pctpl,
             ticker: (bench/bench[0]-1),

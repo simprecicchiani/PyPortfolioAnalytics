@@ -3,15 +3,15 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9.*
+  - python=3.10.*
   - pip
   - pandas
   - numpy
-  - matplotlib
+  - pandas-datareader
   - jupyterlab
   - nbclassic>=0.3.*
+  - requests-cache
   - pip:
     - alpha-vantage==2.3.*
     - pyxirr==0.6.*
-    - streamlit==0.86.*
-    - yfinance==0.1.*
+    - streamlit==1.0.*
