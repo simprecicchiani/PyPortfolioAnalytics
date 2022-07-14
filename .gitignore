@@ -3,6 +3,4 @@
 .vscode
 .streamlit
 __pycache__
-mutual_funds.csv
-secrets.py
-cache.sqlite
+venv/
