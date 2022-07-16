@@ -1,7 +1,0 @@
-Date,Ticker,Order,Local Price,Price,Quantity,Currency,Fee
-2021-02-01,CASH.EUR,deposit,1,1,35000,EUR,0
-2021-02-15,ENEL.MI,purchase,8.51,8.51,180,EUR,7.66
-2021-06-01,AZN.L,purchase,7957,9254.48,3,GBP,138.82
-2021-06-10,FB,purchase,330,270.89,10,USD,13.54
-2021-07-11,AZN.L,sale,8340,9765.81,2,GBP,97.66
-2021-07-22,CASH.EUR,withdrawal,1,1,15000,EUR,0

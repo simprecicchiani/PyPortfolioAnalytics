@@ -1,66 +1,140 @@
+from datetime import date, datetime
+from itertools import cycle
+from typing import get_args
+import requests
 import streamlit as st
-from helpers.portfolio import Portfolio
+import pandas as pd
+from metrics import get_portfolio_metrics
+from helpers import load_tickers, TOBAY
 
-def dashboard():
-    col1, col2, col3, col4 = st.columns(4)
 
-    col1.metric('Portfolio Value',f"${round(st.portfolio.value[-1],2)}", f"${round(st.portfolio.pl[-1],2)}")
+from models import OrderType, Transaction, Portfolio
 
-    col2.metric("Daily Change",f"${round(st.portfolio.daily_change[-1],2)}", f"{round(st.portfolio.daily_ret[-1]*100,2)}%")
+st.set_page_config(page_title="Python Portfolio Analytics", layout="wide")
 
-    col3.metric("Annual Volatility _expected return", f"{round(st.portfolio.std*100, 2)}%", f"{round(st.portfolio.exp_ret,2)*100}%")
+st.title("Python Portfolio Analytics")
 
-    col4.metric("Sharpe _sortino Raio", f"{round(st.portfolio.sharpe, 2)}", f"{round(st.portfolio.sortino, 2)}")
+ss = st.session_state
 
-    col11, col12 = st.columns(2)
+if not ss.get("portfolio"):
+    ss.portfolio = Portfolio(transactions=[])
+    ss.session = requests.Session()
 
-    with col11:
-        st.subheader('Portfolio Value')
-        st.line_chart(st.portfolio.value)
-        st.subheader('Portfolio vs SPY (% return)')
-        st.line_chart(st.portfolio.benchmark('SPY')*100)
 
-    with col12:
-        st.subheader('Portfolio Holdings')
-        st.line_chart(st.portfolio.holdings)
-        st.subheader('Portfolio Cash Flows')
-        st.bar_chart(st.portfolio.cash_flows)
+def add_transactions_from_file():
+    if not ss.uploaded_file:
+        return
+    try:
+        transactions_df = pd.read_csv(ss.uploaded_file)
+        transactions_df.date = pd.to_datetime(transactions_df.date)
+        ss.portfolio.transactions.extend(
+            Transaction(**t) for t in transactions_df.to_dict("records")
+        )
+    except Exception:
+        st.error("Error reading file. Please check the format.")
 
-st.set_page_config(layout="wide")
-st.title('Python Portfolio Analytics Dashboard 💰')
 
-with st.expander('Instructions'):
-    '''
-    ### Input file example
+TICKERS = load_tickers("assets/yahoo_securities.json")
 
-    | Date       | Ticker   | Order      | Price  | Quantity | Fee |
-    |------------|----------|------------|--------|----------|-----|
-    | 2019-10-01 | CASH.USD | deposit    | 1      | 100000   | 0   |
-    | 2019-10-11 | AAPL     | purchase   | 234.52 | 88       | 35  |
-    | 2019-11-25 | MSFT     | purchase   | 148.3  | 250      | 25  |
-    | 2019-12-04 | AAPL     | sale       | 262.08 | 50       | 20  |
-    | 2020-01-06 | FB       | purchase   | 208    | 100      | 10  |
-    | 2020-01-25 | CASH.USD | withdrawal | 1      | 30000    | 0   |
-    
-    [Download example](https://github.com/simprecicchiani/PyPortfolioAnalytics/raw/master/assets/portfolios/generic.csv)
-    
-    ### Input file rules:
+with st.expander("Add Transaction"):
+    col_left, col_right = st.columns(2)
+    new_transaction: Transaction = Transaction(
+        date=col_left.date_input(
+            label="Date",
+            value=date(2020, 1, 1),
+            max_value=TOBAY(),
+        ),
+        order=col_right.selectbox(label="Order", options=get_args(OrderType)),
+        ticker=col_left.selectbox(
+            label="Asset",
+            options=TICKERS,
+            format_func=lambda x: " | ".join(y for y in (x["ticker"], x["name"]) if y),
+        )["ticker"],
+        shares=col_right.number_input(
+            label="Shares",
+            min_value=0.0,
+            step=10.0,
+            format="%a",
+        ),
+        price=col_left.number_input(
+            label="Price",
+            step=10.0,
+            format="%a",
+        ),
+    )
 
-    - File format is `.csv`
-    - Firs row contains these columns `Date`, `Ticker`, `Order`, `Price`, `Quantity`, `Fee`
-    - Date format is `%Y-%m-%d`
-    - Type of order are `deposit`, `withdrawal`, `purchase`, `sale`
-    - Only supports [Yahoo Finance](https://finance.yahoo.com/) tickers
+    st.button(
+        label="Add Transaction",
+        on_click=ss.portfolio.transactions.append,
+        args=(new_transaction,),
+    )
 
-    ### Caveats
+    st.file_uploader(
+        label="Add Transactions from file",
+        type=["csv"],
+        accept_multiple_files=False,
+        key="uploaded_file",
+        on_change=add_transactions_from_file,
+    )
 
-    - Works with single currency account only
-    - Requires a deposit to calculate return on investment
-    - Only accepts transactions within business days
-    '''
-uploaded_file = st.file_uploader('Upload your transactions', type='csv')
 
-if uploaded_file is not None:
-    st.portfolio = Portfolio(uploaded_file)
-    st.portfolio.run()
-    dashboard()
+if ss.portfolio.transactions:
+    with st.expander("Remove Transaction"):
+
+        rm_transaction_i = st.selectbox(
+            label="",
+            options=[
+                (idx, t._asdict()) for idx, t in enumerate(ss.portfolio.transactions)
+            ],
+            format_func=lambda x: " | ".join(str(y) for y in x[1].values()),
+        )[0]
+        st.button(
+            label=f"Remove Transaction",
+            on_click=ss.portfolio.transactions.pop,
+            args=(rm_transaction_i,),
+        )
+
+    st.subheader("Transactions")
+    st.table(ss.portfolio.transactions)
+    st.download_button(
+        label="Download Transactions",
+        data=pd.DataFrame(ss.portfolio.transactions)
+        .to_csv(index=False)
+        .encode("utf-8"),
+        file_name="transactions.csv",
+        mime="text/csv",
+    )
+
+    # process portfolio
+    inv, nav, ret = ss.portfolio.process()
+
+    history_df = pd.concat([nav, inv], axis=1)
+    st.subheader("History")
+    st.line_chart(history_df)
+    st.download_button(
+        label="Download History",
+        data=history_df.to_csv().encode("utf-8"),
+        file_name="portfolio_history.csv",
+        mime="text/csv",
+    )
+    st.subheader("Performance")
+    return_df = ret.to_frame()
+    st.line_chart(return_df)
+    st.download_button(
+        label="Download Returns",
+        data=return_df.to_csv().encode("utf-8"),
+        file_name="portfolio_returns.csv",
+        mime="text/csv",
+    )
+    st.subheader("Metrics")
+    metrics = get_portfolio_metrics(nav, inv, ret)
+    for (field, value), col in zip(metrics._asdict().items(), cycle(st.columns(3))):
+        col.metric(
+            label=field.replace("_", " ").replace("pct", "(%)").title(),
+            value=value.strftime("%-d %b. %Y")
+            if isinstance(value, datetime)
+            else value,
+        )
+
+else:
+    st.warning("Please add a transaction first")
