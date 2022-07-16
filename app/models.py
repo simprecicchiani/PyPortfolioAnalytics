@@ -7,13 +7,25 @@ import yfinance as yf
 import requests
 import streamlit as st
 
-from app.helpers import TOBAY, DatePeriod, to_bday_fwd, bdatetime
+from helpers import TOBAY, DatePeriod, to_bday_fwd, bdatetime
 
 ss = st.session_state
 
 
 OrderType = Literal["purchase", "sale"]
 CurrencyId = Literal["USD", "EUR"]
+
+
+class PortfolioMetrics(NamedTuple):
+    NAV: float
+    investment: float
+    profit_loss: float
+    profit_loss_pct: float
+    annualized_return_pct: float
+    annualized_volatility_pct: float
+    sharpe_ratio: float
+    max_drawdown_pct: float
+    max_drawdown_date: datetime
 
 
 class Transaction(NamedTuple):
@@ -143,7 +155,11 @@ def get_securities_data(
         ).history(interval="1d", start=date_period.start.strftime("%Y-%m-%d"))
 
         securities_price_list.append(hist_df["Close"].rename(ticker))
+        if "Dividends" not in hist_df.columns:
+            hist_df["Dividends"] = 0.0
         securities_dividend_list.append(hist_df["Dividends"].rename(ticker))
+        if "Stock Splits" not in hist_df.columns:
+            hist_df["Stock Splits"] = 0.0
         securities_split_list.append(hist_df["Stock Splits"].rename(ticker))
 
     date_index = pd.DatetimeIndex(
@@ -155,7 +171,7 @@ def get_securities_data(
         .reindex(index=date_index)
         .fillna(method="ffill")
         .fillna(method="bfill")
-        .fillna(1.0),  # for missing ticker (e.g. currency)
+        .fillna(1.0),  # for missing ticker
         pd.concat(securities_dividend_list, axis=1)
         .reindex(index=date_index)
         .fillna(0.0),
